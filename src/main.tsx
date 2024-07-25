@@ -1,22 +1,32 @@
 import './index.scss';
 
 // import { init } from '@elastic/apm-rum';
-import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Provider } from 'react-redux';
+import { Persistor, persistStore } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
 
 import App from './App.tsx';
+import { store } from './store/store.ts';
+import { I18nProvider } from './theme/app/i18n/i18nProvider.tsx';
 
+const persistor: Persistor = persistStore(store);
 
-// init({
-//   serviceName: 'Yeebam Client App',
-//   serverUrl: import.meta.env.VITE_ELASTIC_APM_SERVER,
-//   serviceVersion: '0.0.1',
-//   active: true
-// });
+const queryClient = new QueryClient();
+const container = document.getElementById('root');
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-           <App />
-
-  </React.StrictMode>
-);
+if (container) {
+  ReactDOM.createRoot(container).render(
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <I18nProvider>
+            <App />
+          </I18nProvider>
+        </PersistGate>
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+      </Provider>
+    </QueryClientProvider>
+  );
+}
